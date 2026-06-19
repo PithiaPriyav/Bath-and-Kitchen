@@ -1,0 +1,157 @@
+---
+import Base from '../layouts/Base.astro';
+import Placeholder from '../components/Placeholder.astro';
+import { categories, service } from '../data/site';
+---
+
+<Base
+  title="Products — Tiles, Kitchens, Bathrooms & Wardrobes"
+  description="Explore Bath & Kitchen Studio's ranges: large-format tiles, bespoke kitchens, premium bathrooms and fitted wardrobes — from Villeroy & Boch, Roca and Nitco."
+  path="/products"
+>
+  <section class="sec sec--white page-head">
+    <div class="wrap">
+      <p class="kicker">What we carry</p>
+      <h1 class="h-xl page-head__h">
+        EVERYTHING FOR <span class="dim">THE BATH</span><br />AND THE KITCHEN.
+      </h1>
+      <p class="page-head__lead">
+        Four categories, specified to work together as one calm, coherent space —
+        backed by in-house 3D rendering so you see the result before you commit.
+      </p>
+    </div>
+  </section>
+
+  {categories.map((c, i) => {
+    const dark = i % 2 === 1;
+    return (
+      <section class={`sec ${dark ? 'sec--black on-black' : 'sec--grey'}`} id={c.slug}>
+        <div class="wrap cat-row">
+          <div class={`cat-row__media ${i % 2 === 1 ? 'cat-row__media--right' : ''}`}>
+            <Placeholder label={`${c.name} — gallery`} ratio="4 / 3" tone={dark ? 'dark' : 'light'} />
+          </div>
+          <div class="cat-row__copy reveal">
+            <p class="kicker">{String(i + 1).padStart(2, '0')} · {c.name}</p>
+            <h2 class="h-lg cat-row__h">{c.tagline}</h2>
+            <p class="cat-row__blurb">{c.blurb}</p>
+            <ul class="cat-row__list">
+              {c.highlights.map((h) => <li>{h}</li>)}
+            </ul>
+            <p class="cat-row__brands">
+              <span class="cat-row__brands-label">Brands carried:</span> {c.brands.join(' · ')}
+            </p>
+            <div class="cat-row__actions">
+              <a class="btn" href={`/products/${c.slug}`}>Explore {c.name}</a>
+              <a class="btn btn--ghost" href="/contact">Enquire</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  })}
+
+  <section class="sec sec--white">
+    <div class="wrap service-cta reveal">
+      <p class="kicker">Before you buy</p>
+      <h2 class="h-lg service-cta__h">{service.name.toUpperCase()}.</h2>
+      <p class="service-cta__p">{service.blurb}</p>
+      <a class="btn" href="/contact">Book a consultation</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head {
+    padding-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .page-head__h {
+    margin-top: 1rem;
+  }
+  .page-head__lead {
+    margin-top: 1.6rem;
+    max-width: 56ch;
+    font-size: 1.1rem;
+    color: var(--grey-700);
+  }
+
+  .cat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+  .cat-row__media--right {
+    order: 2;
+  }
+  .cat-row__h {
+    margin-top: 1rem;
+  }
+  .cat-row__blurb {
+    margin-top: 1.3rem;
+    color: inherit;
+    opacity: 0.92;
+  }
+  .on-black .cat-row__blurb {
+    color: var(--grey-300);
+  }
+  .cat-row__list {
+    margin: 1.5rem 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.7rem;
+  }
+  .cat-row__list li {
+    position: relative;
+    padding-left: 1.4rem;
+    font-size: 0.95rem;
+  }
+  .cat-row__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+  }
+  .cat-row__brands {
+    font-size: 0.9rem;
+    color: var(--grey-500);
+    margin-bottom: 1.6rem;
+  }
+  .cat-row__brands-label {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.78rem;
+  }
+  .cat-row__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+
+  .service-cta {
+    text-align: center;
+    max-width: 60ch;
+    margin-inline: auto;
+  }
+  .service-cta__h {
+    margin: 1rem 0 1.4rem;
+  }
+  .service-cta__p {
+    color: var(--grey-700);
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 860px) {
+    .cat-row {
+      grid-template-columns: 1fr;
+    }
+    .cat-row__media,
+    .cat-row__media--right {
+      order: -1;
+    }
+  }
+</style>

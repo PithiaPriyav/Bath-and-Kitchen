@@ -1,0 +1,360 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+
+export interface Props {
+  title: string;
+  description?: string;
+  /** Path beginning with "/", used for canonical + OG url. */
+  path?: string;
+  /** Optional override for the social share image (defaults to /og.jpg). */
+  image?: string;
+}
+
+const {
+  title,
+  description = site.description,
+  path = '/',
+  image = '/og.jpg',
+} = Astro.props;
+
+const canonical = new URL(path, site.url).href;
+const ogImage = new URL(image, site.url).href;
+const fullTitle = path === '/' ? `${site.name} — ${site.tagline}` : `${title} — ${site.name}`;
+
+// HomeGoodsStore structured data, injected on every page.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeGoodsStore',
+  name: site.name,
+  legalName: site.legalName,
+  description: site.description,
+  url: site.url,
+  email: site.email,
+  telephone: site.phones[0],
+  image: ogImage,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: `${site.address.line1}, ${site.address.line2}`,
+    addressLocality: site.address.city,
+    addressRegion: site.address.region,
+    addressCountry: site.address.countryCode,
+  },
+  sameAs: [site.socials.instagram, site.socials.facebook, site.socials.linkedin],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Per-page head extras (e.g. BreadcrumbList JSON-LD) -->
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    /* Monochrome base */
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --grey-900: #1a1a1a;
+    --grey-700: #3d3d3d;
+    --grey-500: #777777;
+    --grey-400: #9a9a9a;
+    --grey-300: #c7c7c7;
+    --grey-200: #e4e4e4;
+    --grey-100: #f3f3f3;
+
+    /* OFFER-ONLY accents — never use outside offer elements */
+    --red: #e11b22;
+    --yellow: #ffd200;
+
+    /* Type */
+    --font: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+    /* Layout */
+    --maxw: 1240px;
+    --gutter: clamp(1.25rem, 4vw, 4rem);
+    --section-y: clamp(4rem, 9vw, 8rem);
+
+    /* Motion */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Hard design rule: no rounded corners anywhere. We never set a radius;
+     everything stays square by default. */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font);
+    font-weight: 400;
+    color: var(--black);
+    background: var(--white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.98;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  /* Visible focus ring everywhere */
+  :focus-visible {
+    outline: 3px solid var(--black);
+    outline-offset: 3px;
+  }
+  .on-black :focus-visible,
+  .sec--black :focus-visible {
+    outline-color: var(--white);
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 200;
+    background: var(--black);
+    color: var(--white);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+  }
+  .skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+  }
+
+  /* ---- Shared layout helpers ---- */
+  .wrap {
+    width: 100%;
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .sec {
+    padding-block: var(--section-y);
+  }
+  .sec--black {
+    background: var(--black);
+    color: var(--white);
+  }
+  .sec--white {
+    background: var(--white);
+    color: var(--black);
+  }
+  .sec--grey {
+    background: var(--grey-100);
+    color: var(--black);
+  }
+
+  /* The brand signature: two-tone headline. */
+  .dim {
+    color: var(--grey-500);
+  }
+  .sec--black .dim {
+    color: var(--grey-500);
+  }
+
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--grey-500);
+  }
+
+  .h-xl {
+    font-size: clamp(2.6rem, 9vw, 6rem);
+  }
+  .h-lg {
+    font-size: clamp(2.1rem, 6.5vw, 4rem);
+  }
+  .h-md {
+    font-size: clamp(1.5rem, 4vw, 2.4rem);
+  }
+
+  /* ---- Buttons (square, no radius) ---- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    padding: 0.9rem 1.6rem;
+    font-family: var(--font);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border: 1.5px solid var(--black);
+    background: var(--black);
+    color: var(--white);
+    transition: transform 0.25s var(--ease), background 0.25s var(--ease),
+      color 0.25s var(--ease);
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  .btn--ghost {
+    background: transparent;
+    color: var(--black);
+  }
+  .btn--ghost:hover {
+    background: var(--black);
+    color: var(--white);
+  }
+  .sec--black .btn,
+  .on-black .btn {
+    border-color: var(--white);
+    background: var(--white);
+    color: var(--black);
+  }
+  .sec--black .btn--ghost,
+  .on-black .btn--ghost {
+    background: transparent;
+    color: var(--white);
+  }
+  .sec--black .btn--ghost:hover,
+  .on-black .btn--ghost:hover {
+    background: var(--white);
+    color: var(--black);
+  }
+
+  /* OFFER-ONLY button variant */
+  .btn--offer {
+    background: var(--red);
+    border-color: var(--red);
+    color: var(--white);
+  }
+  .btn--offer:hover {
+    background: #c5161c;
+    border-color: #c5161c;
+  }
+
+  /* ---- Reveal animation ---- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  }
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+    .btn:hover {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  // Subtle scroll reveal, opt-in via .reveal. Respects reduced motion.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-in');
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.08 }
+    );
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-in'));
+  }
+</script>

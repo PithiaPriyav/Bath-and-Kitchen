@@ -1,0 +1,158 @@
+---
+import Logo from './Logo.astro';
+import { site, nav, categories } from '../data/site';
+const year = new Date().getFullYear();
+const telHref = (p: string) => 'tel:' + p.replace(/\s+/g, '');
+---
+
+<footer class="footer on-black">
+  <div class="wrap footer__grid">
+    <div class="footer__brand">
+      <Logo tone="light" />
+      <p class="footer__tag">{site.tagline}</p>
+      <div class="footer__socials">
+        <a href={site.socials.instagram} aria-label="Instagram" rel="noopener" target="_blank">Instagram</a>
+        <a href={site.socials.facebook} aria-label="Facebook" rel="noopener" target="_blank">Facebook</a>
+        <a href={site.socials.linkedin} aria-label="LinkedIn" rel="noopener" target="_blank">LinkedIn</a>
+      </div>
+    </div>
+
+    <nav class="footer__col" aria-label="Footer">
+      <h2 class="footer__h">Explore</h2>
+      <ul>
+        {nav.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="footer__col">
+      <h2 class="footer__h">Products</h2>
+      <ul>
+        {categories.map((c) => (
+          <li><a href={`/products/${c.slug}`}>{c.name}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h2 class="footer__h">Visit</h2>
+      <address class="footer__address">
+        {site.address.line1}<br />
+        {site.address.line2}<br />
+        {site.address.city}, {site.address.country}
+      </address>
+      <ul class="footer__contact">
+        {site.phones.map((p) => (
+          <li><a href={telHref(p)}>{p}</a></li>
+        ))}
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="wrap footer__bar">
+    <p>© {year} {site.legalName}. All rights reserved.</p>
+    <p class="footer__credit">{site.address.city}, {site.address.country}</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--black);
+    color: var(--white);
+    padding-top: clamp(3.5rem, 7vw, 6rem);
+  }
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.4fr;
+    gap: 2.5rem;
+    padding-bottom: 3rem;
+  }
+  .footer__tag {
+    margin-top: 1rem;
+    color: var(--grey-400);
+    font-size: 0.95rem;
+    max-width: 22ch;
+  }
+  .footer__socials {
+    display: flex;
+    gap: 1.1rem;
+    margin-top: 1.25rem;
+  }
+  .footer__socials a {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--grey-300);
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .footer__socials a:hover {
+    color: var(--white);
+    border-color: var(--white);
+  }
+  .footer__h {
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    color: var(--grey-500);
+    margin-bottom: 1.1rem;
+  }
+  .footer__col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .footer__col a {
+    color: var(--grey-300);
+    font-size: 0.95rem;
+    transition: color 0.2s var(--ease);
+  }
+  .footer__col a:hover {
+    color: var(--white);
+  }
+  .footer__address {
+    font-style: normal;
+    color: var(--grey-300);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  .footer__contact {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .footer__bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--grey-900);
+    font-size: 0.8rem;
+    color: var(--grey-500);
+  }
+
+  @media (max-width: 760px) {
+    .footer__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .footer__brand {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 440px) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

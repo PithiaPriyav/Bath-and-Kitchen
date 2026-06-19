@@ -1,0 +1,56 @@
+---
+/**
+ * Temporary square image block. Swap for Astro <Image /> from astro:assets once
+ * real photography lands (see build task #1). `label` documents what belongs here.
+ */
+export interface Props {
+  label?: string;
+  ratio?: string;
+  tone?: 'light' | 'dark';
+  class?: string;
+}
+const { label = '', ratio = '4 / 3', tone = 'light', class: cls = '' } = Astro.props;
+---
+
+<div class={`ph ph--${tone} ${cls}`} style={`aspect-ratio:${ratio}`} role="img" aria-label={label || 'Placeholder image'}>
+  <svg class="ph__icon" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <rect x="6" y="9" width="36" height="30" stroke="currentColor" stroke-width="1.5" />
+    <circle cx="17" cy="19" r="3.5" stroke="currentColor" stroke-width="1.5" />
+    <path d="M6 33l11-9 8 6 6-5 11 9" stroke="currentColor" stroke-width="1.5" />
+  </svg>
+  {label && <span class="ph__label">{label}</span>}
+</div>
+
+<style>
+  .ph {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    overflow: hidden;
+  }
+  .ph--light {
+    background: var(--grey-100);
+    color: var(--grey-400);
+    border: 1px solid var(--grey-200);
+  }
+  .ph--dark {
+    background: var(--grey-900);
+    color: var(--grey-500);
+    border: 1px solid var(--grey-700);
+  }
+  .ph__icon {
+    width: 40px;
+    height: 40px;
+  }
+  .ph__label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    text-align: center;
+    padding-inline: 1rem;
+  }
+</style>

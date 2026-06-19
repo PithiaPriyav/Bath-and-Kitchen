@@ -1,0 +1,362 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, categories } from '../data/site';
+
+// WhatsApp business number (digits only) — first listed phone.
+const waNumber = site.phones[0].replace(/[^\d]/g, '');
+const telHref = (p: string) => 'tel:' + p.replace(/\s+/g, '');
+const mapsQuery = encodeURIComponent(
+  `${site.legalName}, ${site.address.line1}, ${site.address.line2}, ${site.address.city}`
+);
+---
+
+<Base
+  title="Contact & Showroom"
+  description="Visit Bath & Kitchen Studio at The Mandrake, Parklands, Nairobi. Call, email or send an enquiry — and book an in-house 3D rendering consultation."
+  path="/contact"
+>
+  <section class="sec sec--white page-head">
+    <div class="wrap">
+      <p class="kicker">Get in touch</p>
+      <h1 class="h-xl page-head__h">
+        LET'S GET IT <span class="dim">RIGHT THE</span><br />FIRST TIME.
+      </h1>
+      <p class="page-head__lead">
+        Visit our Parklands showroom, or send us the details of your project and our
+        team will come back to you with options and pricing.
+      </p>
+    </div>
+  </section>
+
+  <section class="sec sec--grey">
+    <div class="wrap contact-grid">
+      <!-- ====== Form ====== -->
+      <div class="contact-form-wrap">
+        <h2 class="contact__h">Send an enquiry</h2>
+        <form class="contact-form" id="enquiry" novalidate>
+          <div class="field">
+            <label for="name">Name <span aria-hidden="true">*</span></label>
+            <input id="name" name="name" type="text" autocomplete="name" required aria-required="true" />
+            <p class="field__error" data-error-for="name" hidden>Please enter your name.</p>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="phone">Phone <span aria-hidden="true">*</span></label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required aria-required="true" />
+              <p class="field__error" data-error-for="phone" hidden>Please enter a valid phone number.</p>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" />
+              <p class="field__error" data-error-for="email" hidden>Please enter a valid email.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="interest">I'm interested in</label>
+            <select id="interest" name="interest">
+              <option value="">Select a category…</option>
+              {categories.map((c) => <option value={c.name}>{c.name}</option>)}
+              <option value="3D Rendering">3D Rendering service</option>
+              <option value="Other">Something else</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="message">Project details <span aria-hidden="true">*</span></label>
+            <textarea id="message" name="message" rows="5" required aria-required="true"
+              placeholder="Tell us about your space, timeline and budget…"></textarea>
+            <p class="field__error" data-error-for="message" hidden>Please add a few details about your project.</p>
+          </div>
+
+          <button class="btn contact-form__submit" type="submit">Send via WhatsApp</button>
+
+          <p class="contact-form__note">
+            This opens WhatsApp with your enquiry pre-filled to send to our team.
+            Prefer email? Write to
+            <a href={`mailto:${site.email}`}>{site.email}</a>.
+          </p>
+
+          <p class="form-status" id="form-status" role="status" aria-live="polite" hidden></p>
+        </form>
+      </div>
+
+      <!-- ====== Details ====== -->
+      <aside class="contact-info">
+        <div class="info-block">
+          <h2 class="info-block__h">Showroom</h2>
+          <address class="info-block__addr">
+            {site.address.line1}<br />
+            {site.address.line2}<br />
+            {site.address.city}, {site.address.country}
+          </address>
+          <a class="info-link" href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} target="_blank" rel="noopener">
+            Open in Google Maps →
+          </a>
+        </div>
+
+        <div class="info-block">
+          <h2 class="info-block__h">Call or WhatsApp</h2>
+          <ul class="info-list">
+            {site.phones.map((p) => (
+              <li><a href={telHref(p)}>{p}</a></li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="info-block">
+          <h2 class="info-block__h">Email</h2>
+          <a class="info-link" href={`mailto:${site.email}`}>{site.email}</a>
+        </div>
+
+        <div class="info-block">
+          <h2 class="info-block__h">Follow</h2>
+          <div class="info-socials">
+            <a href={site.socials.instagram} target="_blank" rel="noopener">Instagram</a>
+            <a href={site.socials.facebook} target="_blank" rel="noopener">Facebook</a>
+            <a href={site.socials.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<script define:vars={{ waNumber }}>
+  const form = document.getElementById('enquiry');
+  const status = document.getElementById('form-status');
+
+  const showError = (name, show) => {
+    const el = document.querySelector(`[data-error-for="${name}"]`);
+    const input = document.getElementById(name);
+    if (el) el.hidden = !show;
+    if (input) input.setAttribute('aria-invalid', show ? 'true' : 'false');
+  };
+
+  const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const isPhone = (v) => v.replace(/[^\d]/g, '').length >= 7;
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const name = (data.get('name') || '').toString().trim();
+    const phone = (data.get('phone') || '').toString().trim();
+    const email = (data.get('email') || '').toString().trim();
+    const interest = (data.get('interest') || '').toString().trim();
+    const message = (data.get('message') || '').toString().trim();
+
+    const errors = {
+      name: !name,
+      phone: !isPhone(phone),
+      email: email !== '' && !isEmail(email),
+      message: !message,
+    };
+    showError('name', errors.name);
+    showError('phone', errors.phone);
+    showError('email', errors.email);
+    showError('message', errors.message);
+
+    const ok = !Object.values(errors).some(Boolean);
+
+    if (!ok) {
+      status.hidden = false;
+      status.className = 'form-status form-status--error';
+      status.textContent = 'Please fix the highlighted fields and try again.';
+      const firstError = form.querySelector('[aria-invalid="true"]');
+      if (firstError) firstError.focus();
+      return;
+    }
+
+    const lines = [
+      'New enquiry from bath-kitchenstudio.com',
+      '',
+      `Name: ${name}`,
+      `Phone: ${phone}`,
+      email ? `Email: ${email}` : null,
+      interest ? `Interested in: ${interest}` : null,
+      '',
+      message,
+    ].filter(Boolean);
+
+    const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(lines.join('\n'))}`;
+    status.hidden = false;
+    status.className = 'form-status form-status--ok';
+    status.textContent = 'Opening WhatsApp with your enquiry… If nothing happens, check your pop-up blocker.';
+    window.open(url, '_blank', 'noopener');
+    form.reset();
+  });
+</script>
+
+<style>
+  .page-head {
+    padding-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .page-head__h {
+    margin-top: 1rem;
+  }
+  .page-head__lead {
+    margin-top: 1.4rem;
+    max-width: 52ch;
+    font-size: 1.1rem;
+    color: var(--grey-700);
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .contact__h {
+    font-size: 1.4rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .contact-form-wrap {
+    background: var(--white);
+    padding: clamp(1.5rem, 3vw, 2.4rem);
+    border-top: 3px solid var(--black);
+  }
+  .field {
+    margin-bottom: 1.2rem;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+  label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+  label span {
+    color: var(--grey-500);
+  }
+  input,
+  select,
+  textarea {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 1rem;
+    padding: 0.8rem 0.9rem;
+    border: 1.5px solid var(--grey-300);
+    background: var(--white);
+    color: var(--black);
+    transition: border-color 0.2s var(--ease);
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--black);
+    outline: none;
+  }
+  input[aria-invalid='true'],
+  textarea[aria-invalid='true'] {
+    border-color: var(--black);
+    border-width: 2px;
+    background: var(--grey-100);
+  }
+  textarea {
+    resize: vertical;
+  }
+  .field__error {
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--black);
+    font-weight: 600;
+  }
+  .contact-form__submit {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  .contact-form__note {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--grey-500);
+  }
+  .contact-form__note a {
+    color: var(--black);
+    text-decoration: underline;
+  }
+  .form-status {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .form-status--ok {
+    background: var(--grey-100);
+    border-left: 3px solid var(--black);
+  }
+  .form-status--error {
+    background: var(--grey-100);
+    border-left: 3px solid var(--black);
+    color: var(--black);
+  }
+
+  /* ---- Info ---- */
+  .info-block {
+    padding-bottom: 1.6rem;
+    margin-bottom: 1.6rem;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .info-block:last-child {
+    border-bottom: none;
+  }
+  .info-block__h {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    color: var(--grey-500);
+    margin-bottom: 0.8rem;
+  }
+  .info-block__addr {
+    font-style: normal;
+    line-height: 1.7;
+    margin-bottom: 0.8rem;
+  }
+  .info-link {
+    font-weight: 600;
+    border-bottom: 1px solid var(--black);
+    padding-bottom: 1px;
+  }
+  .info-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  .info-socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .info-socials a {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+  }
+  .info-socials a:hover {
+    border-color: var(--black);
+  }
+
+  @media (max-width: 820px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 460px) {
+    .field-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,520 @@
+---
+import Base from '../layouts/Base.astro';
+import Placeholder from '../components/Placeholder.astro';
+import {
+  site,
+  categories,
+  clientele,
+  service,
+  offer,
+  offerIsVisible,
+  offerHasStarted,
+  offerWindow,
+  offerStatusLabel,
+} from '../data/site';
+
+const live = offerIsVisible();
+const started = offerHasStarted();
+const statusLabel = offerStatusLabel();
+---
+
+<Base
+  title="Premium Tiles, Kitchens, Bathrooms & Wardrobes in Nairobi"
+  description={site.description}
+  path="/"
+>
+  <!-- ============ HERO (offer-led) ============ -->
+  <section class="hero">
+    <div class="wrap hero__inner">
+      <div class="hero__copy">
+        <p class="kicker">{site.legalName}</p>
+        <h1 class="hero__title h-xl">
+          GET IT <span class="dim">RIGHT THE</span><br />FIRST TIME.
+        </h1>
+        <p class="hero__lead">
+          Nairobi's studio for premium tiles, kitchens, bathrooms and wardrobes —
+          with in-house 3D rendering so you see it before you build it.
+        </p>
+        <div class="hero__actions">
+          {live ? (
+            <a class="btn btn--offer" href="/offers">
+              {started ? 'Shop the Home Upgrade Event' : 'Preview the Home Upgrade Event'}
+            </a>
+          ) : (
+            <a class="btn" href="/products">Explore products</a>
+          )}
+          <a class="btn btn--ghost" href="/contact">Visit the showroom</a>
+        </div>
+      </div>
+
+      <div class="hero__media">
+        <Placeholder label="Hero — finished bathroom / kitchen" ratio="4 / 5" />
+      </div>
+    </div>
+
+    {live && (
+      <div class="wrap">
+        <a class="offer-strip" href="/offers">
+          <span class="offer-strip__tag">{started ? offer.kicker : 'Coming Soon'}</span>
+          <span class="offer-strip__text">
+            <strong>{offer.name}:</strong> {offer.headline}. {statusLabel || offerWindow()}.
+          </span>
+          <span class="offer-strip__cta">See the deals →</span>
+        </a>
+      </div>
+    )}
+  </section>
+
+  <!-- ============ STATEMENT (two-tone) ============ -->
+  <section class="sec sec--white statement">
+    <div class="wrap">
+      <p class="kicker reveal">Inspired Living, Every Day</p>
+      <h2 class="h-lg statement__h reveal">
+        SURFACES, FITTINGS AND CABINETRY <span class="dim">CHOSEN WITH RESTRAINT</span> —
+        SO YOUR SPACE FEELS OPEN, NOT BUSY.
+      </h2>
+    </div>
+  </section>
+
+  <!-- ============ PRODUCTS ============ -->
+  <section class="sec sec--grey">
+    <div class="wrap">
+      <div class="head-row reveal">
+        <div>
+          <p class="kicker">What we do</p>
+          <h2 class="h-md">Four categories, one standard.</h2>
+        </div>
+        <a class="btn btn--ghost head-row__cta" href="/products">All products</a>
+      </div>
+
+      <ul class="cat-grid">
+        {categories.map((c) => (
+          <li class="cat reveal">
+            <a class="cat__link" href={`/products/${c.slug}`}>
+              <Placeholder label={`${c.name} — category`} ratio="1 / 1" />
+              <div class="cat__body">
+                <h3 class="cat__name">{c.name}</h3>
+                <p class="cat__tag">{c.tagline}</p>
+                <span class="cat__more">Explore {c.name} →</span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 3D RENDERING SERVICE ============ -->
+  <section class="sec sec--black on-black">
+    <div class="wrap service">
+      <div class="service__media">
+        <Placeholder label="3D render preview" ratio="4 / 3" tone="dark" />
+      </div>
+      <div class="service__copy reveal">
+        <p class="kicker">The studio difference</p>
+        <h2 class="h-lg service__h">
+          SEE IT <span class="dim">BEFORE</span> YOU BUILD IT.
+        </h2>
+        <p class="service__lead">{service.blurb}</p>
+        <a class="btn" href="/contact">Book a 3D consultation</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GET IT RIGHT / THE TILING MISTAKE ============ -->
+  <section class="sec sec--white">
+    <div class="wrap">
+      <div class="head-row reveal">
+        <div>
+          <p class="kicker">Why specification matters</p>
+          <h2 class="h-md">Small choices, big difference.</h2>
+        </div>
+      </div>
+      <div class="compare">
+        <div class="compare__col reveal">
+          <span class="compare__label compare__label--wrong">Wrong</span>
+          <div class="tilegrid tilegrid--small" aria-hidden="true">
+            {Array.from({ length: 42 }).map(() => <span></span>)}
+          </div>
+          <h3 class="compare__h">Too many small tiles</h3>
+          <p class="compare__p">Busy grout lines crowd the eye. The room shrinks and feels chaotic.</p>
+        </div>
+        <div class="compare__col reveal">
+          <span class="compare__label">Correct</span>
+          <div class="tilegrid tilegrid--large" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <h3 class="compare__h">Large format tiles</h3>
+          <p class="compare__p">Fewer grout lines. The eye travels. The room feels open and spacious.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLIENTELE ============ -->
+  <section class="sec sec--grey">
+    <div class="wrap">
+      <div class="head-row reveal">
+        <div>
+          <p class="kicker">Who we work with</p>
+          <h2 class="h-md">Built for every kind of project.</h2>
+        </div>
+      </div>
+      <ul class="clients">
+        {clientele.map((c, i) => (
+          <li class="client reveal">
+            <span class="client__num">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="client__h">{c.title}</h3>
+            <p class="client__p">{c.blurb}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {live && (
+    <!-- ============ OFFER BAND (OFFER-ONLY accent) ============ -->
+    <section class="offer-band">
+      <div class="wrap offer-band__inner">
+        <div>
+          <p class="offer-band__kicker">{statusLabel || offer.kicker} · {offerWindow()}</p>
+          <h2 class="h-md offer-band__h">{offer.name}</h2>
+          <p class="offer-band__sub">{offer.headline} — while stocks last.</p>
+        </div>
+        <a class="btn btn--offer" href="/offers">View the deals</a>
+      </div>
+    </section>
+  )}
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="sec sec--black on-black cta-final">
+    <div class="wrap cta-final__inner">
+      <p class="kicker">Not sure what works for you?</p>
+      <h2 class="h-xl cta-final__h">
+        GET IT <span class="dim">RIGHT THE</span><br />FIRST TIME.
+      </h2>
+      <p class="cta-final__sub">Visit our showroom and let our experts guide you.</p>
+      <p class="cta-final__addr">
+        {site.address.line1}, {site.address.line2}, {site.address.city}
+      </p>
+      <div class="hero__actions">
+        <a class="btn" href="/contact">Plan your visit</a>
+        <a class="btn btn--ghost" href={`tel:${site.phones[0].replace(/\s+/g, '')}`}>
+          {site.phones[0]}
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---- Hero ---- */
+  .hero {
+    padding-block: clamp(2.5rem, 6vw, 5rem) clamp(2rem, 4vw, 3rem);
+  }
+  .hero__inner {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+  .hero__title {
+    margin-top: 1.1rem;
+  }
+  .hero__lead {
+    margin-top: 1.6rem;
+    max-width: 46ch;
+    font-size: clamp(1rem, 1.4vw, 1.18rem);
+    color: var(--grey-700);
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 2rem;
+  }
+  .hero__media {
+    width: 100%;
+  }
+
+  .offer-strip {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding: 0.9rem 1.2rem;
+    background: var(--black);
+    color: var(--white);
+  }
+  .offer-strip__tag {
+    flex: none;
+    background: var(--yellow);
+    color: var(--black);
+    font-weight: 700;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.6rem;
+  }
+  .offer-strip__text {
+    flex: 1;
+    font-size: 0.92rem;
+  }
+  .offer-strip__cta {
+    flex: none;
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--yellow);
+  }
+
+  /* ---- Statement ---- */
+  .statement__h {
+    margin-top: 1.2rem;
+    max-width: 20ch;
+  }
+
+  /* ---- Section head row ---- */
+  .head-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .head-row .kicker {
+    margin-bottom: 0.6rem;
+  }
+
+  /* ---- Category grid ---- */
+  .cat-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  .cat__link {
+    display: block;
+    background: var(--white);
+    height: 100%;
+    transition: transform 0.3s var(--ease);
+  }
+  .cat__link:hover {
+    transform: translateY(-4px);
+  }
+  .cat__body {
+    padding: 1.2rem;
+  }
+  .cat__name {
+    font-size: 1.2rem;
+  }
+  .cat__tag {
+    margin-top: 0.4rem;
+    color: var(--grey-500);
+    font-size: 0.9rem;
+  }
+  .cat__more {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ---- Service ---- */
+  .service {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .service__h {
+    margin-top: 1rem;
+  }
+  .service__lead {
+    margin-top: 1.4rem;
+    margin-bottom: 2rem;
+    color: var(--grey-300);
+    max-width: 46ch;
+  }
+
+  /* ---- Compare (tiling) ---- */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+  .compare__label {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--grey-500);
+    margin-bottom: 1rem;
+  }
+  .tilegrid {
+    display: grid;
+    gap: 4px;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 1.4rem;
+  }
+  .tilegrid--small {
+    grid-template-columns: repeat(7, 1fr);
+    background: var(--white);
+  }
+  .tilegrid--small span {
+    background: var(--black);
+  }
+  .tilegrid--large {
+    grid-template-columns: repeat(2, 1fr);
+    background: var(--grey-300);
+  }
+  .tilegrid--large span {
+    background: var(--grey-100);
+  }
+  .compare__h {
+    font-size: 1.2rem;
+  }
+  .compare__p {
+    margin-top: 0.6rem;
+    color: var(--grey-700);
+    max-width: 32ch;
+  }
+
+  /* ---- Clientele ---- */
+  .clients {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  .client {
+    background: var(--white);
+    padding: 1.6rem;
+    border-top: 3px solid var(--black);
+  }
+  .client__num {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: var(--grey-400);
+  }
+  .client__h {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+  .client__p {
+    margin-top: 0.6rem;
+    color: var(--grey-700);
+    font-size: 0.92rem;
+  }
+
+  /* ---- Offer band (OFFER-ONLY) ---- */
+  .offer-band {
+    background: var(--red);
+    color: var(--white);
+  }
+  .offer-band__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+  }
+  .offer-band__kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+  .offer-band__h {
+    margin-top: 0.6rem;
+  }
+  .offer-band__sub {
+    margin-top: 0.6rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .offer-band .btn--offer {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--red);
+  }
+  .offer-band .btn--offer:hover {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--black);
+  }
+
+  /* ---- Final CTA ---- */
+  .cta-final__inner {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .cta-final__h {
+    margin-top: 1rem;
+  }
+  .cta-final__sub {
+    margin-top: 1.4rem;
+    color: var(--grey-300);
+    font-size: 1.1rem;
+  }
+  .cta-final__addr {
+    margin-top: 0.6rem;
+    color: var(--grey-500);
+    font-size: 0.95rem;
+  }
+  .cta-final .hero__actions {
+    justify-content: center;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 980px) {
+    .cat-grid,
+    .clients {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 860px) {
+    .hero__inner {
+      grid-template-columns: 1fr;
+    }
+    .hero__media {
+      order: -1;
+      max-width: 440px;
+    }
+    .service {
+      grid-template-columns: 1fr;
+    }
+    .service__media {
+      order: 1;
+    }
+  }
+  @media (max-width: 620px) {
+    .compare {
+      grid-template-columns: 1fr;
+    }
+    .offer-band__inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .head-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  @media (max-width: 460px) {
+    .cat-grid,
+    .clients {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

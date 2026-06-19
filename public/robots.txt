@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bath-kitchenstudio.com/sitemap-index.xml

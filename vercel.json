@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/our-products", "destination": "/products", "permanent": true },
+    { "source": "/our-products/(.*)", "destination": "/products", "permanent": true },
+    { "source": "/offers/(.*)", "destination": "/offers", "permanent": true },
+    { "source": "/contact/(.*)", "destination": "/contact", "permanent": true }
+  ]
+}
