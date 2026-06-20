@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Placeholder from '../components/Placeholder.astro';
+import { Image } from 'astro:assets';
 import {
   site,
   categories,
@@ -13,6 +13,37 @@ import {
   offerStatusLabel,
 } from '../data/site';
 
+// Dummy imagery (swap for real photography later — same <Image /> pipeline).
+import heroA from '../assets/home/hero-a.jpg';
+import heroB from '../assets/home/hero-b.jpg';
+import service3d from '../assets/home/service-3d.jpg';
+import feat1 from '../assets/home/feat-1.jpg';
+import feat2 from '../assets/home/feat-2.jpg';
+import feat3 from '../assets/home/feat-3.jpg';
+import feat4 from '../assets/home/feat-4.jpg';
+import catTiles from '../assets/home/cat-tiles.jpg';
+import catKitchens from '../assets/home/cat-kitchens.jpg';
+import catBathrooms from '../assets/home/cat-bathrooms.jpg';
+import catWardrobes from '../assets/home/cat-wardrobes.jpg';
+import av1 from '../assets/home/av-1.jpg';
+import av2 from '../assets/home/av-2.jpg';
+import av3 from '../assets/home/av-3.jpg';
+import av4 from '../assets/home/av-4.jpg';
+
+const catImg: Record<string, ImageMetadata> = {
+  tiles: catTiles,
+  kitchens: catKitchens,
+  bathrooms: catBathrooms,
+  wardrobes: catWardrobes,
+};
+const avatars = [av1, av2, av3, av4];
+const features = [
+  { src: feat1, alt: 'A finished open-plan living space with large-format flooring' },
+  { src: feat2, alt: 'A handle-less kitchen run with run-to-ceiling cabinetry' },
+  { src: feat3, alt: 'A calm bathroom with a wall-hung vanity and mirror' },
+  { src: feat4, alt: 'A bright interior styled with restraint' },
+];
+
 const live = offerIsVisible();
 const started = offerHasStarted();
 const statusLabel = offerStatusLabel();
@@ -23,32 +54,78 @@ const statusLabel = offerStatusLabel();
   description={site.description}
   path="/"
 >
-  <!-- ============ HERO (offer-led) ============ -->
+  <!-- ============ HERO (editorial, image-in-headline) ============ -->
   <section class="hero">
-    <div class="wrap hero__inner">
-      <div class="hero__copy">
-        <p class="kicker">{site.legalName}</p>
-        <h1 class="hero__title h-xl">
-          GET IT <span class="dim">RIGHT THE</span><br />FIRST TIME.
-        </h1>
-        <p class="hero__lead">
-          Nairobi's studio for premium tiles, kitchens, bathrooms and wardrobes —
-          with in-house 3D rendering so you see it before you build it.
-        </p>
-        <div class="hero__actions">
-          {live ? (
-            <a class="btn btn--offer" href="/offers">
-              {started ? 'Shop the Home Upgrade Event' : 'Preview the Home Upgrade Event'}
-            </a>
-          ) : (
-            <a class="btn" href="/products">Explore products</a>
-          )}
-          <a class="btn btn--ghost" href="/contact">Visit the showroom</a>
-        </div>
-      </div>
+    <div class="wrap">
+      <p class="kicker hero__kicker">{site.legalName} · Nairobi</p>
 
-      <div class="hero__media">
-        <Placeholder label="Hero — finished bathroom / kitchen" ratio="4 / 5" />
+      <h1 class="hero__title">
+        <span class="hero__line">
+          INSPIRED
+          <span class="hero__inset hero__inset--wide">
+            <Image src={heroA} alt="A finished kitchen in warm light" widths={[240, 480]} sizes="(max-width:600px) 28vw, 240px" />
+          </span>
+          LIVING,
+        </span>
+        <span class="hero__line">
+          <span class="hero__inset hero__inset--sq">
+            <Image src={heroB} alt="A spa-grade bathroom" widths={[160, 320]} sizes="(max-width:600px) 18vw, 160px" />
+          </span>
+          EVERY <span class="dim">DAY.</span>
+        </span>
+      </h1>
+
+      <div class="hero__grid">
+        <!-- left: intro + avatars + CTA -->
+        <div class="hero__intro">
+          <div class="avatars" aria-hidden="true">
+            {avatars.map((a) => (
+              <span class="avatars__item">
+                <Image src={a} alt="" width={48} height={48} />
+              </span>
+            ))}
+            <span class="avatars__label">Trusted by homeowners,<br />developers &amp; designers</span>
+          </div>
+
+          <p class="hero__lead">
+            Premium tiles, kitchens, bathrooms and wardrobes — specified with
+            restraint and brought to life with in-house 3D rendering, so you see
+            your space before you build it.
+          </p>
+
+          <div class="hero__actions">
+            {live ? (
+              <a class="btn btn--offer" href="/offers">
+                {started ? 'Shop the Home Upgrade Event' : 'Preview the Home Upgrade Event'}
+              </a>
+            ) : (
+              <a class="btn" href="/contact">Contact us now</a>
+            )}
+            <a class="btn btn--ghost" href="/products">Explore products</a>
+          </div>
+        </div>
+
+        <!-- right: image carousel with arrows -->
+        <div class="hero__carousel">
+          <div class="carousel__head">
+            <span class="carousel__caption">Recent work from the studio</span>
+            <div class="carousel__nav">
+              <button class="carousel__btn" type="button" data-dir="-1" aria-label="Previous image">
+                <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              </button>
+              <button class="carousel__btn" type="button" data-dir="1" aria-label="Next image">
+                <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              </button>
+            </div>
+          </div>
+          <ul class="carousel__track" id="hero-track">
+            {features.map((f) => (
+              <li class="carousel__slide">
+                <Image src={f.src} alt={f.alt} widths={[480, 760, 1040]} sizes="(max-width:860px) 80vw, 540px" />
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -91,7 +168,9 @@ const statusLabel = offerStatusLabel();
         {categories.map((c) => (
           <li class="cat reveal">
             <a class="cat__link" href={`/products/${c.slug}`}>
-              <Placeholder label={`${c.name} — category`} ratio="1 / 1" />
+              <span class="cat__media">
+                <Image src={catImg[c.slug]} alt={`${c.name} — ${c.tagline}`} widths={[280, 560]} sizes="(max-width:980px) 45vw, 280px" />
+              </span>
               <div class="cat__body">
                 <h3 class="cat__name">{c.name}</h3>
                 <p class="cat__tag">{c.tagline}</p>
@@ -108,7 +187,7 @@ const statusLabel = offerStatusLabel();
   <section class="sec sec--black on-black">
     <div class="wrap service">
       <div class="service__media">
-        <Placeholder label="3D render preview" ratio="4 / 3" tone="dark" />
+        <Image src={service3d} alt="A 3D render of a planned bathroom in perspective" widths={[480, 760, 1040]} sizes="(max-width:860px) 90vw, 540px" />
       </div>
       <div class="service__copy reveal">
         <p class="kicker">The studio difference</p>
@@ -210,31 +289,188 @@ const statusLabel = offerStatusLabel();
 <style>
   /* ---- Hero ---- */
   .hero {
-    padding-block: clamp(2.5rem, 6vw, 5rem) clamp(2rem, 4vw, 3rem);
+    padding-block: clamp(2rem, 5vw, 4rem) clamp(2rem, 4vw, 3rem);
   }
-  .hero__inner {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: clamp(2rem, 5vw, 4.5rem);
-    align-items: center;
+  .hero__kicker {
+    margin-bottom: clamp(1rem, 2vw, 1.6rem);
   }
+
+  /* Editorial headline with images inset between words */
   .hero__title {
-    margin-top: 1.1rem;
+    font-size: clamp(2.4rem, 7.6vw, 6rem);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+  }
+  .hero__line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.2em;
+  }
+  .hero__line + .hero__line {
+    margin-top: 0.12em;
+  }
+  .hero__inset {
+    display: inline-block;
+    overflow: hidden;
+    flex: none;
+    align-self: center;
+    /* square — no radius, per brand */
+  }
+  .hero__inset :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero__inset--wide {
+    width: clamp(6rem, 20vw, 13rem);
+    height: clamp(2.6rem, 6.6vw, 4.8rem);
+  }
+  .hero__inset--sq {
+    width: clamp(2.6rem, 6.6vw, 4.8rem);
+    height: clamp(2.6rem, 6.6vw, 4.8rem);
+  }
+
+  /* Hero lower grid: intro (left) + carousel (right) */
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
   }
   .hero__lead {
-    margin-top: 1.6rem;
-    max-width: 46ch;
-    font-size: clamp(1rem, 1.4vw, 1.18rem);
+    margin-top: 1.4rem;
+    max-width: 42ch;
+    font-size: clamp(0.98rem, 1.3vw, 1.1rem);
     color: var(--grey-700);
   }
   .hero__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.9rem;
-    margin-top: 2rem;
+    margin-top: 1.8rem;
   }
-  .hero__media {
+
+  /* Avatar cluster (square, overlapping) */
+  .avatars {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .avatars__item {
+    width: 48px;
+    height: 48px;
+    overflow: hidden;
+    margin-left: -10px;
+    border: 2px solid var(--white);
+    flex: none;
+  }
+  .avatars__item:first-child {
+    margin-left: 0;
+  }
+  .avatars__item :global(img) {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .avatars__label {
+    margin-left: 1rem;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--grey-500);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  /* Carousel */
+  .hero__carousel {
+    min-width: 0;
+  }
+  .carousel__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .carousel__caption {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    color: var(--grey-500);
+  }
+  .carousel__nav {
+    display: flex;
+    gap: 0.6rem;
+  }
+  .carousel__btn {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    border: 1.5px solid var(--black);
+    color: var(--black);
+    cursor: pointer;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .carousel__btn:hover {
+    background: var(--black);
+    color: var(--white);
+  }
+  .carousel__track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .carousel__track::-webkit-scrollbar {
+    display: none;
+  }
+  .carousel__slide {
+    flex: 0 0 88%;
+    max-width: 540px;
+    scroll-snap-align: start;
+  }
+  .carousel__slide :global(img) {
+    width: 100%;
+    height: clamp(16rem, 32vw, 26rem);
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Section image media (categories / service) */
+  .cat__media,
+  .service__media :global(img) {
+    display: block;
+    overflow: hidden;
+  }
+  .cat__media {
+    aspect-ratio: 1 / 1;
+  }
+  .cat__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s var(--ease);
+  }
+  .cat__link:hover .cat__media :global(img) {
+    transform: scale(1.04);
+  }
+  .service__media :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
   }
 
   .offer-strip {
@@ -484,18 +720,26 @@ const statusLabel = offerStatusLabel();
     }
   }
   @media (max-width: 860px) {
-    .hero__inner {
+    .hero__grid {
       grid-template-columns: 1fr;
-    }
-    .hero__media {
-      order: -1;
-      max-width: 440px;
+      align-items: stretch;
     }
     .service {
       grid-template-columns: 1fr;
     }
     .service__media {
       order: 1;
+    }
+  }
+  @media (max-width: 560px) {
+    .hero__line {
+      gap: 0.12em;
+    }
+    .avatars__label {
+      font-size: 0.7rem;
+    }
+    .carousel__slide {
+      flex-basis: 84%;
     }
   }
   @media (max-width: 620px) {
@@ -518,3 +762,20 @@ const statusLabel = offerStatusLabel();
     }
   }
 </style>
+
+<script>
+  // Hero carousel: scroll by one slide on prev/next.
+  const track = document.getElementById('hero-track');
+  if (track) {
+    const step = () => {
+      const slide = track.querySelector<HTMLElement>('.carousel__slide');
+      return slide ? slide.offsetWidth + 16 : track.clientWidth;
+    };
+    document.querySelectorAll<HTMLButtonElement>('.carousel__btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const dir = Number(btn.dataset.dir) || 1;
+        track.scrollBy({ left: dir * step(), behavior: 'smooth' });
+      });
+    });
+  }
+</script>
