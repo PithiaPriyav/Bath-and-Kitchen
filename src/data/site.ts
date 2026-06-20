@@ -231,12 +231,36 @@ export const categories: Category[] = [
   },
 ];
 
+/**
+ * Granular "shop by category" entries for the home page browse grid.
+ * `img` is the asset key under src/assets/home/browse/<img>.jpg; `cat` is the
+ * parent product category page each one links to.
+ */
+export interface BrowseItem {
+  name: string;
+  img: string;
+  cat: string;
+}
+
+export const browse: BrowseItem[] = [
+  { name: 'Floor Tiles', img: 'floor-tiles', cat: 'tiles' },
+  { name: 'Wall Tiles', img: 'wall-tiles', cat: 'tiles' },
+  { name: 'Outdoor Tiles', img: 'outdoor-tiles', cat: 'tiles' },
+  { name: 'Large Format', img: 'large-format', cat: 'tiles' },
+  { name: 'Baths', img: 'baths', cat: 'bathrooms' },
+  { name: 'Toilets', img: 'toilets', cat: 'bathrooms' },
+  { name: 'Showers', img: 'showers', cat: 'bathrooms' },
+  { name: 'Basins', img: 'basins', cat: 'bathrooms' },
+  { name: 'Taps & Brassware', img: 'taps', cat: 'bathrooms' },
+  { name: 'Vanities', img: 'vanities', cat: 'bathrooms' },
+  { name: 'Kitchens', img: 'kitchens', cat: 'kitchens' },
+  { name: 'Wardrobes', img: 'wardrobes', cat: 'wardrobes' },
+];
+
 export interface Clientele {
   title: string;
   blurb: string;
-}
-
-export const clientele: Clientele[] = [
+}export const clientele: Clientele[] = [
   {
     title: 'Homeowners',
     blurb: 'Renovating one room or building from the ground up — we guide every choice.',
