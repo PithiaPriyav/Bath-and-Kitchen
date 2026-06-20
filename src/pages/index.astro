@@ -44,6 +44,26 @@ const features = [
   { src: feat4, alt: 'A bright interior styled with restraint' },
 ];
 
+// Showroom marquee + 3-step process.
+const marquee = ['Tiles', 'Kitchens', 'Bathrooms', 'Wardrobes', '3D Rendering', 'Villeroy & Boch', 'Roca', 'Nitco'];
+const steps = [
+  {
+    n: '01',
+    title: 'Visit the showroom',
+    body: 'See and feel the ranges in person. Our team learns your space, your style and your budget.',
+  },
+  {
+    n: '02',
+    title: 'See it in 3D',
+    body: 'We render your kitchen or bathroom photo-realistically, so you decide with total confidence.',
+  },
+  {
+    n: '03',
+    title: 'Install with confidence',
+    body: 'Sign off the design, we supply the products, and your space comes together — right the first time.',
+  },
+];
+
 const live = offerIsVisible();
 const started = offerHasStarted();
 const statusLabel = offerStatusLabel();
@@ -76,7 +96,6 @@ const statusLabel = offerStatusLabel();
       </h1>
 
       <div class="hero__grid">
-        <!-- left: intro + avatars + CTA -->
         <div class="hero__intro">
           <div class="avatars" aria-hidden="true">
             {avatars.map((a) => (
@@ -95,9 +114,7 @@ const statusLabel = offerStatusLabel();
 
           <div class="hero__actions">
             {live ? (
-              <a class="btn btn--offer" href="/offers">
-                {started ? 'Shop the Home Upgrade Event' : 'Preview the Home Upgrade Event'}
-              </a>
+              <a class="btn btn--offer" href="/offers">Shop the Home Upgrade Event</a>
             ) : (
               <a class="btn" href="/contact">Contact us now</a>
             )}
@@ -105,7 +122,6 @@ const statusLabel = offerStatusLabel();
           </div>
         </div>
 
-        <!-- right: image carousel with arrows -->
         <div class="hero__carousel">
           <div class="carousel__head">
             <span class="carousel__caption">Recent work from the studio</span>
@@ -127,10 +143,8 @@ const statusLabel = offerStatusLabel();
           </ul>
         </div>
       </div>
-    </div>
 
-    {live && (
-      <div class="wrap">
+      {live && (
         <a class="offer-strip" href="/offers">
           <span class="offer-strip__tag">{started ? offer.kicker : 'Coming Soon'}</span>
           <span class="offer-strip__text">
@@ -138,8 +152,17 @@ const statusLabel = offerStatusLabel();
           </span>
           <span class="offer-strip__cta">See the deals →</span>
         </a>
-      </div>
-    )}
+      )}
+    </div>
+  </section>
+
+  <!-- ============ BRAND / OFFERING MARQUEE ============ -->
+  <section class="marquee on-black" aria-hidden="true">
+    <div class="marquee__track">
+      {[...marquee, ...marquee, ...marquee].map((m) => (
+        <span class="marquee__item">{m}<span class="marquee__dot">◆</span></span>
+      ))}
+    </div>
   </section>
 
   <!-- ============ STATEMENT (two-tone) ============ -->
@@ -153,7 +176,7 @@ const statusLabel = offerStatusLabel();
     </div>
   </section>
 
-  <!-- ============ PRODUCTS ============ -->
+  <!-- ============ PRODUCTS (overlay tiles) ============ -->
   <section class="sec sec--grey">
     <div class="wrap">
       <div class="head-row reveal">
@@ -164,22 +187,48 @@ const statusLabel = offerStatusLabel();
         <a class="btn btn--ghost head-row__cta" href="/products">All products</a>
       </div>
 
-      <ul class="cat-grid">
-        {categories.map((c) => (
-          <li class="cat reveal">
-            <a class="cat__link" href={`/products/${c.slug}`}>
-              <span class="cat__media">
-                <Image src={catImg[c.slug]} alt={`${c.name} — ${c.tagline}`} widths={[280, 560]} sizes="(max-width:980px) 45vw, 280px" />
-              </span>
-              <div class="cat__body">
-                <h3 class="cat__name">{c.name}</h3>
-                <p class="cat__tag">{c.tagline}</p>
-                <span class="cat__more">Explore {c.name} →</span>
+      <ul class="prodtiles">
+        {categories.map((c, i) => (
+          <li class="ptile reveal">
+            <a class="ptile__link" href={`/products/${c.slug}`}>
+              <Image
+                class="ptile__img"
+                src={catImg[c.slug]}
+                alt={`${c.name} — ${c.tagline}`}
+                widths={[400, 800]}
+                sizes="(max-width:760px) 92vw, 600px"
+              />
+              <span class="ptile__num">{String(i + 1).padStart(2, '0')}</span>
+              <div class="ptile__cap">
+                <h3 class="ptile__name">{c.name}</h3>
+                <p class="ptile__tag">{c.tagline}</p>
+                <span class="ptile__more">Explore {c.name} <span aria-hidden="true">→</span></span>
               </div>
             </a>
           </li>
         ))}
       </ul>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="sec sec--white">
+    <div class="wrap">
+      <div class="head-row reveal">
+        <div>
+          <p class="kicker">How it works</p>
+          <h2 class="h-md">From showroom to finished space.</h2>
+        </div>
+      </div>
+      <ol class="steps">
+        {steps.map((s) => (
+          <li class="step reveal">
+            <span class="step__num">{s.n}</span>
+            <h3 class="step__title">{s.title}</h3>
+            <p class="step__body">{s.body}</p>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 
@@ -315,7 +364,6 @@ const statusLabel = offerStatusLabel();
     overflow: hidden;
     flex: none;
     align-self: center;
-    /* square — no radius, per brand */
   }
   .hero__inset :global(img) {
     display: block;
@@ -332,7 +380,6 @@ const statusLabel = offerStatusLabel();
     height: clamp(2.6rem, 6.6vw, 4.8rem);
   }
 
-  /* Hero lower grid: intro (left) + carousel (right) */
   .hero__grid {
     display: grid;
     grid-template-columns: 0.8fr 1.2fr;
@@ -357,7 +404,6 @@ const statusLabel = offerStatusLabel();
   .avatars {
     display: flex;
     align-items: center;
-    gap: 0;
   }
   .avatars__item {
     width: 48px;
@@ -448,31 +494,7 @@ const statusLabel = offerStatusLabel();
     display: block;
   }
 
-  /* Section image media (categories / service) */
-  .cat__media,
-  .service__media :global(img) {
-    display: block;
-    overflow: hidden;
-  }
-  .cat__media {
-    aspect-ratio: 1 / 1;
-  }
-  .cat__media :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.5s var(--ease);
-  }
-  .cat__link:hover .cat__media :global(img) {
-    transform: scale(1.04);
-  }
-  .service__media :global(img) {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-  }
-
+  /* ---- Offer strip ---- */
   .offer-strip {
     display: flex;
     align-items: center;
@@ -505,6 +527,45 @@ const statusLabel = offerStatusLabel();
     color: var(--yellow);
   }
 
+  /* ---- Marquee ---- */
+  .marquee {
+    background: var(--black);
+    color: var(--white);
+    overflow: hidden;
+    padding-block: 1.1rem;
+    border-block: 1px solid var(--grey-900);
+  }
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee 38s linear infinite;
+  }
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    color: var(--grey-300);
+  }
+  .marquee__dot {
+    margin-inline: clamp(1.2rem, 3vw, 2.4rem);
+    font-size: 0.6em;
+    color: var(--grey-600, var(--grey-500));
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-33.333%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+
   /* ---- Statement ---- */
   .statement__h {
     margin-top: 1.2rem;
@@ -523,42 +584,111 @@ const statusLabel = offerStatusLabel();
     margin-bottom: 0.6rem;
   }
 
-  /* ---- Category grid ---- */
-  .cat-grid {
+  /* ---- Product overlay tiles ---- */
+  .prodtiles {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
-  .cat__link {
+  .ptile__link {
+    position: relative;
     display: block;
-    background: var(--white);
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--black);
+  }
+  .ptile__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
     height: 100%;
-    transition: transform 0.3s var(--ease);
+    object-fit: cover;
+    transition: transform 0.6s var(--ease);
   }
-  .cat__link:hover {
-    transform: translateY(-4px);
+  .ptile__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.85) 0%, rgba(10, 10, 10, 0.1) 55%, rgba(10, 10, 10, 0.05) 100%);
   }
-  .cat__body {
-    padding: 1.2rem;
+  .ptile__link:hover .ptile__img {
+    transform: scale(1.05);
   }
-  .cat__name {
-    font-size: 1.2rem;
+  .ptile__num {
+    position: absolute;
+    top: 1rem;
+    right: 1.3rem;
+    z-index: 1;
+    font-weight: 800;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.22);
   }
-  .cat__tag {
-    margin-top: 0.4rem;
-    color: var(--grey-500);
-    font-size: 0.9rem;
+  .ptile__cap {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    padding: clamp(1.2rem, 2.5vw, 1.8rem);
+    color: var(--white);
   }
-  .cat__more {
+  .ptile__name {
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+  }
+  .ptile__tag {
+    margin-top: 0.3rem;
+    color: var(--grey-300);
+    font-size: 0.95rem;
+  }
+  .ptile__more {
     display: inline-block;
     margin-top: 0.9rem;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .ptile__link:hover .ptile__more,
+  .ptile__link:focus-visible .ptile__more {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---- Steps ---- */
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    counter-reset: step;
+  }
+  .step {
+    padding-top: 1.6rem;
+    border-top: 2px solid var(--black);
+  }
+  .step__num {
+    font-weight: 800;
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    line-height: 1;
+    color: var(--grey-300);
+  }
+  .step__title {
+    margin-top: 1rem;
+    font-size: 1.25rem;
+  }
+  .step__body {
+    margin-top: 0.7rem;
+    color: var(--grey-700);
+    max-width: 34ch;
   }
 
   /* ---- Service ---- */
@@ -576,6 +706,12 @@ const statusLabel = offerStatusLabel();
     margin-bottom: 2rem;
     color: var(--grey-300);
     max-width: 46ch;
+  }
+  .service__media :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
   }
 
   /* ---- Compare (tiling) ---- */
@@ -713,12 +849,6 @@ const statusLabel = offerStatusLabel();
   }
 
   /* ---- Responsive ---- */
-  @media (max-width: 980px) {
-    .cat-grid,
-    .clients {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
   @media (max-width: 860px) {
     .hero__grid {
       grid-template-columns: 1fr;
@@ -730,16 +860,14 @@ const statusLabel = offerStatusLabel();
     .service__media {
       order: 1;
     }
+    .steps {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
   }
-  @media (max-width: 560px) {
-    .hero__line {
-      gap: 0.12em;
-    }
-    .avatars__label {
-      font-size: 0.7rem;
-    }
-    .carousel__slide {
-      flex-basis: 84%;
+  @media (max-width: 760px) {
+    .prodtiles {
+      grid-template-columns: 1fr;
     }
   }
   @media (max-width: 620px) {
@@ -754,9 +882,22 @@ const statusLabel = offerStatusLabel();
       flex-direction: column;
       align-items: flex-start;
     }
+    .clients {
+      grid-template-columns: 1fr 1fr;
+    }
   }
-  @media (max-width: 460px) {
-    .cat-grid,
+  @media (max-width: 560px) {
+    .hero__line {
+      gap: 0.12em;
+    }
+    .avatars__label {
+      font-size: 0.7rem;
+    }
+    .carousel__slide {
+      flex-basis: 84%;
+    }
+  }
+  @media (max-width: 400px) {
     .clients {
       grid-template-columns: 1fr;
     }
