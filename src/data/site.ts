@@ -98,7 +98,7 @@ export const offer: Offer = {
   kicker: 'Limited Time',
   headline: 'Luxury at Giveaway Prices',
   sub: 'Our biggest event of the year. Premium bath, kitchen and tile lines at once-a-year pricing — while stocks last.',
-  start: '2026-06-22',
+  start: '2026-06-20',
   end: '2026-07-31',
   terms: 'Offer valid 22 Jun – 31 Jul 2026, or while stocks last. Prices shown are showroom prices and exclude installation. Cannot be combined with other promotions.',
   deals: [

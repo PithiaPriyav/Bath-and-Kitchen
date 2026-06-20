@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { Image } from 'astro:assets';
 import {
   site,
   offer,
@@ -10,10 +11,31 @@ import {
   fmt,
 } from '../data/site';
 
+// Category imagery, reused as deal photography stand-ins.
+import catTiles from '../assets/home/cat-tiles.jpg';
+import catKitchens from '../assets/home/cat-kitchens.jpg';
+import catBathrooms from '../assets/home/cat-bathrooms.jpg';
+import catWardrobes from '../assets/home/cat-wardrobes.jpg';
+
+const dealImg: Record<string, ImageMetadata> = {
+  tiles: catTiles,
+  kitchens: catKitchens,
+  bathrooms: catBathrooms,
+  wardrobes: catWardrobes,
+};
+const imgFor = (cat: string) => dealImg[cat.toLowerCase()] ?? catTiles;
+
 const live = offerIsVisible();
 const started = offerHasStarted();
 const statusLabel = offerStatusLabel();
 const saving = (was: number, now: number) => Math.round(((was - now) / was) * 100);
+
+// The first deal is featured; the rest fill the grid.
+const [featured, ...rest] = offer.deals;
+const maxSaving = Math.max(...offer.deals.map((d) => saving(d.was, d.now)));
+const brands = [...new Set(offer.deals.map((d) => d.brand).filter(Boolean))] as string[];
+const endLabel = offerWindow().split('–')[1]?.trim() ?? '';
+const startLabel = offerWindow().split('–')[0]?.trim() ?? '';
 ---
 
 <Base
@@ -27,42 +49,98 @@ const saving = (was: number, now: number) => Math.round(((was - now) / was) * 10
 >
   {live ? (
     <>
-      <!-- ====== Offer hero (OFFER-ONLY accent) ====== -->
-      <section class="offer-hero">
-        <div class="wrap">
-          <span class="offer-hero__tag">{statusLabel || offer.kicker} · {offerWindow()}</span>
-          <h1 class="h-xl offer-hero__h">
-            {offer.name.toUpperCase()}
-          </h1>
-          <p class="offer-hero__headline">{offer.headline}</p>
-          <p class="offer-hero__sub">{offer.sub}</p>
-          {!started && (
-            <p class="offer-hero__preview">
-              Previewing now — doors open {offerWindow().split('–')[0].trim()}. Enquire early to reserve while stocks last.
+      <!-- ====== Hero (monochrome, editorial) ====== -->
+      <section class="sec sec--black on-black ohero">
+        <div class="wrap ohero__inner">
+          <div class="ohero__copy">
+            <p class="ohero__eyebrow">
+              <span class="chip">{statusLabel || offer.kicker}</span>
+              <span class="ohero__dates">{offerWindow()}</span>
             </p>
-          )}
+            <h1 class="h-xl ohero__h">
+              {offer.name.split(' ').slice(0, -1).join(' ').toUpperCase()}
+              <span class="dim"> {offer.name.split(' ').slice(-1)[0].toUpperCase()}</span>
+            </h1>
+            <p class="ohero__headline">{offer.headline}.</p>
+            <p class="ohero__sub">{offer.sub}</p>
+
+            {!started && (
+              <p class="ohero__preview">
+                <span class="ohero__preview-rule" aria-hidden="true"></span>
+                Previewing now — doors open {startLabel}. Enquire early to reserve while stocks last.
+              </p>
+            )}
+
+            <div class="ohero__actions">
+              <a class="btn" href="#deals">See the deals</a>
+              <a class="btn btn--ghost" href="/contact">Plan your visit</a>
+            </div>
+          </div>
+
+          <dl class="ostats">
+            <div class="ostat">
+              <dt>Up to</dt>
+              <dd>{maxSaving}%<span>off</span></dd>
+            </div>
+            <div class="ostat">
+              <dt>Lines on offer</dt>
+              <dd>{offer.deals.length}</dd>
+            </div>
+            <div class="ostat ostat--wide">
+              <dt>Featured brands</dt>
+              <dd class="ostat__brands">{brands.join(' · ')}</dd>
+            </div>
+          </dl>
         </div>
       </section>
 
-      <!-- ====== Deal grid ====== -->
-      <section class="sec sec--white">
+      <!-- ====== Featured deal ====== -->
+      <section class="sec sec--white" id="deals">
         <div class="wrap">
+          <div class="deals-head reveal">
+            <p class="kicker">The deals</p>
+            <h2 class="h-md">Once-a-year pricing.</h2>
+          </div>
+
+          <article class="feature reveal">
+            <div class="feature__media">
+              <Image src={imgFor(featured.category)} alt={featured.name} widths={[480, 760, 1040]} sizes="(max-width:860px) 92vw, 560px" />
+              <span class="badge feature__badge">Save {saving(featured.was, featured.now)}%</span>
+            </div>
+            <div class="feature__body">
+              <p class="deal__cat">Headline deal · {featured.category}</p>
+              <h3 class="feature__name">{featured.name}</h3>
+              {featured.brand && <p class="deal__brand">{featured.brand}</p>}
+              {featured.note && <p class="feature__note">{featured.note}</p>}
+              <div class="priceline">
+                <span class="priceline__was">{fmt(featured.was)}</span>
+                <span class="priceline__now">{fmt(featured.now)}</span>
+                {featured.unit && <span class="priceline__unit">{featured.unit}</span>}
+              </div>
+              <a class="btn btn--offer" href="/contact">Enquire about this deal</a>
+            </div>
+          </article>
+
+          <!-- ====== Deal grid ====== -->
           <ul class="deals">
-            {offer.deals.map((d) => (
+            {rest.map((d) => (
               <li class="deal reveal">
-                <div class="deal__top">
+                <div class="deal__media">
+                  <Image src={imgFor(d.category)} alt={d.name} widths={[300, 600]} sizes="(max-width:920px) 45vw, 360px" />
+                  <span class="badge deal__badge">Save {saving(d.was, d.now)}%</span>
+                </div>
+                <div class="deal__body">
                   <span class="deal__cat">{d.category}</span>
-                  <span class="deal__save">-{saving(d.was, d.now)}%</span>
+                  <h3 class="deal__name">{d.name}</h3>
+                  {d.brand && <p class="deal__brand">{d.brand}</p>}
+                  {d.note && <p class="deal__note">{d.note}</p>}
+                  <div class="priceline">
+                    <span class="priceline__was">{fmt(d.was)}</span>
+                    <span class="priceline__now">{fmt(d.now)}</span>
+                    {d.unit && <span class="priceline__unit">{d.unit}</span>}
+                  </div>
+                  <a class="deal__cta" href="/contact">Enquire <span aria-hidden="true">→</span></a>
                 </div>
-                <h2 class="deal__name">{d.name}</h2>
-                {d.brand && <p class="deal__brand">{d.brand}</p>}
-                {d.note && <p class="deal__note">{d.note}</p>}
-                <div class="deal__prices">
-                  <span class="deal__was">{fmt(d.was)}</span>
-                  <span class="deal__now">{fmt(d.now)}</span>
-                  {d.unit && <span class="deal__unit">{d.unit}</span>}
-                </div>
-                <a class="btn btn--offer deal__cta" href="/contact">Enquire</a>
               </li>
             ))}
           </ul>
@@ -72,14 +150,15 @@ const saving = (was: number, now: number) => Math.round(((was - now) / was) * 10
       </section>
 
       <!-- ====== CTA ====== -->
-      <section class="sec sec--black on-black">
-        <div class="wrap offer-cta">
+      <section class="sec sec--black on-black octa">
+        <div class="wrap octa__inner">
+          <span class="octa__rule" aria-hidden="true"></span>
           <p class="kicker">Don't miss it</p>
-          <h2 class="h-lg">
+          <h2 class="h-xl octa__h">
             LUXURY AT <span class="dim">GIVEAWAY</span> PRICES.
           </h2>
-          <p class="offer-cta__sub">Visit the showroom before {offerWindow().split('–')[1]} — while stocks last.</p>
-          <div class="offer-cta__actions">
+          <p class="octa__sub">Visit the showroom{endLabel ? ` before ${endLabel}` : ''} — while stocks last.</p>
+          <div class="ohero__actions ohero__actions--center">
             <a class="btn" href="/contact">Plan your visit</a>
             <a class="btn btn--ghost" href={`tel:${site.phones[0].replace(/\s+/g, '')}`}>{site.phones[0]}</a>
           </div>
@@ -108,49 +187,233 @@ const saving = (was: number, now: number) => Math.round(((was - now) / was) * 10
 </Base>
 
 <style>
-  /* ---- Offer hero (OFFER-ONLY accent) ---- */
-  .offer-hero {
-    background: var(--red);
-    color: var(--white);
-    padding-block: clamp(3rem, 7vw, 6rem);
+  /* ============ HERO ============ */
+  .ohero {
+    padding-block: clamp(3rem, 7vw, 6.5rem);
   }
-  .offer-hero__tag {
-    display: inline-block;
-    background: var(--yellow);
-    color: var(--black);
-    font-weight: 700;
-    font-size: 0.74rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.4rem 0.7rem;
+  .ohero__inner {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: end;
+  }
+  .ohero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
     margin-bottom: 1.4rem;
   }
-  .offer-hero__h {
-    max-width: 18ch;
-  }
-  .offer-hero__headline {
-    margin-top: 1.2rem;
-    font-size: clamp(1.3rem, 3vw, 2rem);
-    font-weight: 700;
-    color: var(--yellow);
-  }
-  .offer-hero__sub {
-    margin-top: 1rem;
-    max-width: 56ch;
-    color: rgba(255, 255, 255, 0.9);
-  }
-  .offer-hero__preview {
-    margin-top: 1.4rem;
-    display: inline-block;
+  /* Small offer accent — the single pop of colour up top */
+  .chip {
     background: var(--yellow);
     color: var(--black);
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.35rem 0.65rem;
+  }
+  .ohero__dates {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--grey-400);
     font-weight: 600;
-    font-size: 0.9rem;
-    padding: 0.7rem 1rem;
-    max-width: 60ch;
+  }
+  .ohero__h {
+    max-width: 16ch;
+  }
+  .ohero__headline {
+    margin-top: 1.3rem;
+    font-size: clamp(1.3rem, 3vw, 2.1rem);
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.01em;
+  }
+  .ohero__sub {
+    margin-top: 1rem;
+    max-width: 52ch;
+    color: var(--grey-400);
+  }
+  .ohero__preview {
+    position: relative;
+    margin-top: 1.6rem;
+    padding-left: 1.1rem;
+    max-width: 56ch;
+    color: var(--grey-300);
+    font-size: 0.95rem;
+  }
+  .ohero__preview-rule {
+    position: absolute;
+    left: 0;
+    top: 0.15em;
+    bottom: 0.15em;
+    width: 4px;
+    background: var(--yellow);
+  }
+  .ohero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 2rem;
+  }
+  .ohero__actions--center {
+    justify-content: center;
   }
 
-  /* ---- Deals ---- */
+  /* Stats */
+  .ostats {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--grey-900);
+    border: 1px solid var(--grey-900);
+  }
+  .ostat {
+    background: var(--black);
+    padding: 1.3rem 1.4rem;
+  }
+  .ostat--wide {
+    grid-column: 1 / -1;
+  }
+  .ostat dt {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--grey-500);
+    font-weight: 600;
+  }
+  .ostat dd {
+    margin: 0.5rem 0 0;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+  .ostat dd span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--grey-500);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .ostat__brands {
+    font-size: 1rem !important;
+    font-weight: 600;
+    color: var(--grey-300);
+    line-height: 1.4;
+  }
+
+  /* ============ Section head ============ */
+  .deals-head {
+    margin-bottom: clamp(1.6rem, 3vw, 2.4rem);
+  }
+  .deals-head .kicker {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Shared badge (monochrome) */
+  .badge {
+    background: var(--black);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0.6rem;
+  }
+
+  /* Shared price line — red is the single deal-price accent */
+  .priceline {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+  .priceline__was {
+    color: var(--grey-400);
+    text-decoration: line-through;
+    font-size: 0.92rem;
+  }
+  .priceline__now {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--red);
+    letter-spacing: -0.01em;
+  }
+  .priceline__unit {
+    font-size: 0.8rem;
+    color: var(--grey-500);
+  }
+  .deal__cat {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey-500);
+  }
+  .deal__brand {
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--grey-700);
+  }
+
+  /* ============ Featured deal ============ */
+  .feature {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    border: 1px solid var(--grey-200);
+    border-top: 3px solid var(--black);
+    margin-bottom: 2.5rem;
+  }
+  .feature__media {
+    position: relative;
+  }
+  .feature__media :global(img) {
+    width: 100%;
+    height: 100%;
+    min-height: 18rem;
+    object-fit: cover;
+    display: block;
+  }
+  .feature__badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+  }
+  .feature__body {
+    padding: clamp(1.6rem, 3.5vw, 2.6rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .feature__name {
+    margin-top: 0.7rem;
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    line-height: 1.05;
+  }
+  .feature__note {
+    margin: 0.9rem 0 1.4rem;
+    color: var(--grey-700);
+  }
+  .feature__body .priceline {
+    margin-bottom: 1.6rem;
+  }
+  .feature__body .priceline__now {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+  }
+  .feature .btn--offer {
+    align-self: flex-start;
+  }
+
+  /* ============ Deal grid ============ */
   .deals {
     list-style: none;
     margin: 0;
@@ -162,41 +425,44 @@ const saving = (was: number, now: number) => Math.round(((was - now) / was) * 10
   .deal {
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
     border: 1px solid var(--grey-200);
-    border-top: 3px solid var(--red);
+    background: var(--white);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
   }
-  .deal__top {
+  .deal:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -28px rgba(0, 0, 0, 0.5);
+  }
+  .deal__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+  .deal__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s var(--ease);
+  }
+  .deal:hover .deal__media :global(img) {
+    transform: scale(1.05);
+  }
+  .deal__badge {
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem;
+  }
+  .deal__body {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .deal__cat {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--grey-500);
-  }
-  .deal__save {
-    background: var(--red);
-    color: var(--white);
-    font-weight: 700;
-    font-size: 0.78rem;
-    padding: 0.2rem 0.55rem;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.3rem;
   }
   .deal__name {
-    font-size: 1.05rem;
-    line-height: 1.15;
-  }
-  .deal__brand {
-    margin-top: 0.4rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--grey-700);
+    margin-top: 0.5rem;
+    font-size: 1.02rem;
+    line-height: 1.18;
   }
   .deal__note {
     margin-top: 0.6rem;
@@ -204,51 +470,57 @@ const saving = (was: number, now: number) => Math.round(((was - now) / was) * 10
     color: var(--grey-500);
     flex: 1;
   }
-  .deal__prices {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1.2rem;
-  }
-  .deal__was {
-    color: var(--grey-400);
-    text-decoration: line-through;
-    font-size: 0.9rem;
-  }
-  .deal__now {
-    font-weight: 800;
-    font-size: 1.4rem;
-    color: var(--red);
-  }
-  .deal__unit {
-    font-size: 0.8rem;
-    color: var(--grey-500);
+  .deal__body .priceline {
+    margin-top: 1.1rem;
   }
   .deal__cta {
-    margin-top: 1.4rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--grey-200);
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: inline-flex;
+    gap: 0.5rem;
+    transition: gap 0.2s var(--ease);
+  }
+  .deal__cta:hover {
+    gap: 0.9rem;
   }
 
   .offer-terms {
     margin-top: 2.5rem;
     font-size: 0.82rem;
     color: var(--grey-500);
-    max-width: 70ch;
+    max-width: 72ch;
   }
 
-  /* ---- Offer CTA ---- */
-  .offer-cta__sub {
-    margin: 1.2rem 0 2rem;
+  /* ============ CTA ============ */
+  .octa {
+    text-align: center;
+  }
+  .octa__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .octa__rule {
+    width: 56px;
+    height: 4px;
+    background: var(--yellow);
+    margin-bottom: 1.6rem;
+  }
+  .octa__h {
+    margin-top: 0.8rem;
+  }
+  .octa__sub {
+    margin-top: 1.2rem;
     color: var(--grey-300);
     font-size: 1.1rem;
   }
-  .offer-cta__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.9rem;
-  }
 
-  /* ---- Empty state ---- */
+  /* ============ Empty state ============ */
   .empty__inner {
     max-width: 60ch;
   }
@@ -267,14 +539,31 @@ const saving = (was: number, now: number) => Math.round(((was - now) / was) * 10
     gap: 0.9rem;
   }
 
+  /* ============ Responsive ============ */
   @media (max-width: 920px) {
+    .ohero__inner {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
     .deals {
       grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 720px) {
+    .feature {
+      grid-template-columns: 1fr;
+    }
+    .feature__media :global(img) {
+      min-height: 0;
+      aspect-ratio: 16 / 10;
     }
   }
   @media (max-width: 560px) {
     .deals {
       grid-template-columns: 1fr;
+    }
+    .ostats {
+      grid-template-columns: 1fr 1fr;
     }
   }
 </style>
